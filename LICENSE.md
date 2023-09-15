@@ -1,0 +1,1 @@
+Automated Measurement Of Fetal Head Circumference Using 2D UltraSound Images is under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode) license.
