@@ -1,6 +1,9 @@
 .DS_Store
 __pycache__
 .venv/
+venv/
+test_set/
+training_set/
 tmp/
 APP_DATA/
 dataset_tools/

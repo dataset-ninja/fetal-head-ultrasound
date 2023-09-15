@@ -1,12 +1,15 @@
-import supervisely as sly
 import os
-from dataset_tools.convert import unpack_if_archive
-import src.settings as s
 from urllib.parse import unquote, urlparse
-from supervisely.io.fs import get_file_name, get_file_size
-import shutil
 
+import cv2
+import numpy as np
+import supervisely as sly
+from dataset_tools.convert import unpack_if_archive
+from supervisely.io.fs import file_exists, get_file_name
 from tqdm import tqdm
+
+import src.settings as s
+
 
 def download_dataset(teamfiles_dir: str) -> str:
     """Use it for large datasets to convert them on the instance"""
@@ -24,7 +27,9 @@ def download_dataset(teamfiles_dir: str) -> str:
         teamfiles_path = os.path.join(teamfiles_dir, file_name_with_ext)
 
         fsize = api.file.get_directory_size(team_id, teamfiles_dir)
-        with tqdm(desc=f"Downloading '{file_name_with_ext}' to buffer...", total=fsize) as pbar:
+        with tqdm(
+            desc=f"Downloading '{file_name_with_ext}' to buffer...", total=fsize
+        ) as pbar:
             api.file.download(team_id, teamfiles_path, local_path, progress_cb=pbar)
         dataset_path = unpack_if_archive(local_path)
 
@@ -41,7 +46,9 @@ def download_dataset(teamfiles_dir: str) -> str:
                     unit="B",
                     unit_scale=True,
                 ) as pbar:
-                    api.file.download(team_id, teamfiles_path, local_path, progress_cb=pbar)
+                    api.file.download(
+                        team_id, teamfiles_path, local_path, progress_cb=pbar
+                    )
 
                 sly.logger.info(f"Start unpacking archive '{file_name_with_ext}'...")
                 unpack_if_archive(local_path)
@@ -52,7 +59,8 @@ def download_dataset(teamfiles_dir: str) -> str:
 
         dataset_path = storage_dir
     return dataset_path
-    
+
+
 def count_files(path, extension):
     count = 0
     for root, dirs, files in os.walk(path):
@@ -60,21 +68,88 @@ def count_files(path, extension):
             if file.endswith(extension):
                 count += 1
     return count
-    
+
+
 def convert_and_upload_supervisely_project(
     api: sly.Api, workspace_id: int, project_name: str
 ) -> sly.ProjectInfo:
     ### Function should read local dataset and upload it to Supervisely project, then return project info.###
-    raise NotImplementedError("The converter should be implemented manually.")
+    test_path = os.path.join("test_set", "test_set")
+    train_path = os.path.join("training_set", "training_set")
+    batch_size = 50
 
-    # dataset_path = "/local/path/to/your/dataset" # general way
-    # dataset_path = download_dataset(teamfiles_dir) # for large datasets stored on instance
+    project_dict = {
+        "test": [
+            os.path.join(test_path, file)
+            for file in os.listdir(test_path)
+            if file.endswith(".png")
+        ],
+        "train": [
+            os.path.join(train_path, file)
+            for file in os.listdir(train_path)
+            if file.endswith(".png")
+        ],
+    }
 
-    # ... some code here ...
+    def fill_area(mask_np):
+        res = cv2.findContours(
+            mask_np.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+        )
+        contours = res[-2]
+        img_pl = np.zeros((mask_np.shape[0], mask_np.shape[1]))
+        cv2.fillPoly(img_pl, pts=contours, color=(255))
+        return img_pl
 
-    # sly.logger.info('Deleting temporary app storage files...')
-    # shutil.rmtree(storage_dir)
+    def create_ann(image_path):
+        labels = []
+        image_np = sly.imaging.image.read(image_path)[:, :, 0]
+        img_height = image_np.shape[0]
+        img_wight = image_np.shape[1]
+        base_path, file_name = os.path.split(image_path)
+        mask_name = get_file_name(file_name) + "_Annotation.png"
+        mask_path = os.path.join(base_path, mask_name)
+        if file_exists(mask_path):
+            obj_class = meta.get_obj_class("fetal head circumference")
+            mask_np = sly.imaging.image.read(mask_path)[:, :, 0]
+            mask = fill_area(mask_np)
+            obj_mask = mask == 0
+            geometry = sly.Bitmap(~obj_mask)
+            curr_label = sly.Label(geometry, obj_class)
+            labels.append(curr_label)
+        return sly.Annotation(img_size=(img_height, img_wight), labels=labels)
 
-    # return project
+    obj_classes = [sly.ObjClass("fetal head circumference", sly.Bitmap)]
+    project = api.project.create(
+        workspace_id, project_name, change_name_if_conflict=True
+    )
+    meta = sly.ProjectMeta(obj_classes=obj_classes)
+    api.project.update_meta(project.id, meta.to_json())
 
+    dataset_train = api.dataset.create(
+        project.id, "train", change_name_if_conflict=True
+    )
+    dataset_test = api.dataset.create(project.id, "test", change_name_if_conflict=True)
 
+    progress = sly.Progress(
+        "Create dataset {}".format("ds"),
+        len(project_dict["test"]) + len(project_dict["train"]),
+    )
+
+    for ds in project_dict:
+        if ds == "test":
+            dataset = dataset_test
+        else:
+            dataset = dataset_train
+        for img_paths_batch in sly.batched(project_dict[ds], batch_size=batch_size):
+            img_paths = [
+                file_path
+                for file_path in img_paths_batch
+                if "Annotation" not in file_path
+            ]
+            img_names_batch = [os.path.basename(img_path) for img_path in img_paths]
+            img_infos = api.image.upload_paths(dataset.id, img_names_batch, img_paths)
+            img_ids = [im_info.id for im_info in img_infos]
+            anns_batch = [create_ann(image_path) for image_path in img_paths]
+            api.annotation.upload_anns(img_ids, anns_batch)
+            progress.iters_done_report(len(img_names_batch))
+    return project
