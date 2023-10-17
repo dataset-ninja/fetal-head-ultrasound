@@ -22,7 +22,7 @@ HIDE_DATASET = False  # set False when 100% sure about repo quality
 ##################################
 # * After uploading to instance ##
 ##################################
-LICENSE: License = License.CC_BY_4_0()
+LICENSE: License = License.CC_BY_4_0(source_url="https://zenodo.org/records/1327317")
 APPLICATIONS: List[Union[Industry, Domain, Research]] = [Research.Biological()]
 CATEGORY: Category = Category.Biology()
 
@@ -64,7 +64,7 @@ PAPER: Optional[Union[str, List[str], Dict[str, str]]] = [
     "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0200412"
 ]
 BLOGPOST: Optional[Union[str, List[str], Dict[str, str]]] = None
-REPOSITORY: Optional[Union[str, List[str], Dict[str, str]]] = None
+REPOSITORY: Optional[Union[str, List[str], Dict[str, str]]] = {"Zenodo":"https://zenodo.org/records/1327317"}
 
 CITATION_URL: Optional[str] = "https://zenodo.org/record/1322001"
 AUTHORS: Optional[List[str]] = [
