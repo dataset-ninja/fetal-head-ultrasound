@@ -73,6 +73,7 @@ AUTHORS: Optional[List[str]] = [
     "Chris L. de Korte",
     "Bram van Ginneken",
 ]
+AUTHORS_CONTACTS: Optional[List[str]] = ["mariasofia.sappia@radboudumc.nl"]
 
 ORGANIZATION_NAME: Optional[Union[str, List[str]]] = ["Radboud University Nijmegen"]
 ORGANIZATION_URL: Optional[Union[str, List[str]]] = ["https://www.ru.nl/en"]
@@ -126,6 +127,7 @@ def get_settings():
     settings["repository"] = REPOSITORY
     settings["citation_url"] = CITATION_URL
     settings["authors"] = AUTHORS
+    settings["authors_contacts"] = AUTHORS_CONTACTS
     settings["organization_name"] = ORGANIZATION_NAME
     settings["organization_url"] = ORGANIZATION_URL
     settings["slytagsplit"] = SLYTAGSPLIT
