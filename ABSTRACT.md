@@ -13,7 +13,7 @@ The size of each 2D ultrasound image was 800 by 540 pixels with a pixel size ran
 The data was randomly divided into a *train* set and a *test* set of 75 percent (999 images) and 25 percent (335 images), respectively. The GAs were proportionally balanced between the data sets as shown in Table 1. All images that were made during one echographic examination were assigned to either the training or the test set. An independent data set of HC annotations of the images in the test set was created by TLAvdH, a medical researcher who has a technical background in ultrasound imaging and received training from an experienced sonographer in measuring the HC.
 
 |Trimester|Training Set|Testing Set|
-------------------------------------
+|---------|------------|-------------|
 |First|165|55|
 |Second|693|233|
 |Third|141|47|
