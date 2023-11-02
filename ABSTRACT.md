@@ -8,7 +8,7 @@ The size of each 2D ultrasound image was 800 by 540 pixels with a pixel size ran
 
 <span style="font-size: smaller; font-style: italic;">Fig. 1. Example ultrasound images.</span>
 
-![Fig 2](https://i.ibb.co/0CVRsMk/pone-0200412-g002.png)
+![Fig 2](https://journals.plos.org/plosone/article/figure/image?size=large&id=10.1371/journal.pone.0200412.g002)
 
 <span style="font-size: smaller; font-style: italic;">Fig. 2. Distribution of HC and GA for the study data.</span>
 
@@ -30,4 +30,5 @@ As a result of HC18 challenge, the following fetal head circumference parameters
 filename, center_x_mm, center_y_mm, semi_axes_a_mm, semi_axes_b_mm, angle_rad
 ```
 
-![Result](https://i.ibb.co/5WXS0V3/Grand-Challange-Values-90xw-KFs.png)
+<img width="595" alt="fetal_head_preview_1" src="https://github.com/dataset-ninja/fetal-head-ultrasound/assets/123257559/a6473013-ed66-457c-81e4-4cdacbfc6b99">
+
