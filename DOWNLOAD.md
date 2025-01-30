@@ -1,6 +1,6 @@
 Dataset **Fetal Head UltraSound** can be downloaded in [Supervisely format](https://developer.supervisely.com/api-references/supervisely-annotation-json-format):
 
- [Download](https://www.dropbox.com/scl/fi/bkrvlzl4uxl68jc66wjkt/fetal-head-ultrasound-DatasetNinja.tar?rlkey=jes87fyxud8j5x05p1xif9f7x&dl=1)
+ [Download](https://assets.supervisely.com/remote/eyJsaW5rIjogImZzOi8vYXNzZXRzLzIwOTBfRmV0YWwgSGVhZCBVbHRyYVNvdW5kL2ZldGFsLWhlYWQtdWx0cmFzb3VuZC1EYXRhc2V0TmluamEudGFyIiwgInNpZyI6ICIvUnQ5Nm41Y2p5Wml6R0RKQkhyOFhHK2RUSEZzMC9kVi9CbXM5aElzL1J3PSJ9)
 
 As an alternative, it can be downloaded with *dataset-tools* package:
 ``` bash
